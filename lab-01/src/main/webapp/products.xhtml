@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Cosmetics Store</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f5f7;
+            margin: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #a34d78;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #f5e8ef;
+        }
+
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type=submit] {
+            background: #a34d78;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+
+        .field {
+            margin-bottom: 12px;
+        }
+
+        .field label {
+            display: inline-block;
+            width: 145px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+<div class="container">
+
+    <h1>Cosmetics Store</h1>
+    <p>Панель управления магазином косметики</p>
+
+    <h2>Каталог товаров</h2>
+
+    <h:form id="tableForm">
+        <h:dataTable value="#{productBean.products}"
+                     var="p"
+                     styleClass="products-table">
+
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                #{p.id}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Название</f:facet>
+                #{p.name}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Бренд</f:facet>
+                #{p.brand.name}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Категория</f:facet>
+                #{p.category}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Цена, руб.</f:facet>
+                <h:outputText value="#{p.price}">
+                    <f:convertNumber minFractionDigits="2"
+                                     maxFractionDigits="2"
+                                     locale="ru_RU"/>
+                </h:outputText>
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Количество</f:facet>
+                #{p.quantity}
+            </h:column>
+
+            <h:column>
+                <f:facet name="header">Действия</f:facet>
+
+                <h:commandButton value="Изменить"
+                                 action="#{productBean.edit(p)}"/>
+
+                <h:commandButton value="Удалить"
+                                 action="#{productBean.delete(p.id)}"
+                                 onclick="return confirm('Удалить товар?');"/>
+            </h:column>
+
+        </h:dataTable>
+    </h:form>
+
+    <h2>Добавление / редактирование товара</h2>
+
+    <h:form id="editForm">
+
+        <h:messages globalOnly="true" style="color: green;"/>
+
+        <div class="field">
+            <h:outputLabel for="name" value="Название:"/>
+            <h:inputText id="name"
+                         value="#{productBean.product.name}"
+                         required="true"
+                         requiredMessage="Введите название"/>
+            <h:message for="name" style="color: red;"/>
+        </div>
+
+        <div class="field">
+            <h:outputLabel for="category" value="Категория:"/>
+            <h:inputText id="category"
+                         value="#{productBean.product.category}"
+                         required="true"/>
+        </div>
+
+        <div class="field">
+            <h:outputLabel for="price" value="Цена:"/>
+            <h:inputText id="price"
+                         value="#{productBean.product.price}"
+                         required="true">
+                <f:validateDoubleRange minimum="0"/>
+            </h:inputText>
+            <h:message for="price" style="color: red;"/>
+        </div>
+
+        <div class="field">
+            <h:outputLabel for="quantity" value="Количество:"/>
+            <h:inputText id="quantity"
+                         value="#{productBean.product.quantity}"
+                         required="true">
+                <f:validateLongRange minimum="0"/>
+            </h:inputText>
+            <h:message for="quantity" style="color: red;"/>
+        </div>
+
+        <div class="field">
+            <h:outputLabel for="brand" value="Бренд:"/>
+            <h:selectOneMenu id="brand"
+                             value="#{productBean.brandId}"
+                             required="true">
+                <f:selectItem itemLabel="Выберите бренд"
+                              itemValue="#{null}"
+                              noSelectionOption="true"/>
+
+                <f:selectItems value="#{productBean.brands}"
+                               var="b"
+                               itemValue="#{b.id}"
+                               itemLabel="#{b.name}"/>
+            </h:selectOneMenu>
+            <h:message for="brand" style="color: red;"/>
+        </div>
+
+        <h:commandButton value="Сохранить"
+                         action="#{productBean.save}"/>
+
+        <h:commandButton value="Очистить форму"
+                         action="#{productBean.prepareNew}"
+                         immediate="true"/>
+
+    </h:form>
+
+</div>
+</h:body>
+</html>
